@@ -49,7 +49,7 @@
           <tr>
               <th>Name</th>
               <th>Description</th>
-              <th>Action</th>
+              <th>Status</th>
           </tr>
           <c:forEach var="c" items="${enrolled}">
             <tr>
