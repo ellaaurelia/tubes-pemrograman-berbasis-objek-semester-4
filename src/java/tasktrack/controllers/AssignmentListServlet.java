@@ -18,7 +18,6 @@ public class AssignmentListServlet extends HttpServlet {
         try (Connection conn = DatabaseConnection.getConnection()) {
 
             if (id != null && !id.isEmpty()) {
-                // Jika ada ID, ambil satu assignment (edit mode)
                 PreparedStatement ps = conn.prepareStatement("SELECT a.*, c.name AS course_name FROM assignment a JOIN course c ON a.course_id = c.id WHERE a.id = ?");
                 ps.setInt(1, Integer.parseInt(id));
                 ResultSet rs = ps.executeQuery();
@@ -33,7 +32,6 @@ public class AssignmentListServlet extends HttpServlet {
                 }
             }
 
-            // Ambil data courses untuk dropdown
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM course");
             ResultSet courseRs = ps.executeQuery();
 

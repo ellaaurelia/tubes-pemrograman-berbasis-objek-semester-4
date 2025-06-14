@@ -1,9 +1,3 @@
-<%-- 
-    Document   : login
-    Created on : 11 Jun 2025, 08.54.53
-    Author     : rtriv
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>

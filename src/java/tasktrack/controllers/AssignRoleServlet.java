@@ -7,7 +7,6 @@ import javax.servlet.http.*;
 import java.sql.*;
 import java.util.*;
 import tasktrack.utils.DatabaseConnection;
-import tasktrack.models.*;
 
 @WebServlet(name = "AssignRoleServlet", urlPatterns = {"/assignRole"})
 public class AssignRoleServlet extends HttpServlet {
@@ -17,7 +16,6 @@ public class AssignRoleServlet extends HttpServlet {
         int userId = Integer.parseInt(request.getParameter("user_id"));
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // Ambil user lama (student)
             PreparedStatement getUser = conn.prepareStatement("SELECT name, email, password FROM user WHERE id = ?");
             getUser.setInt(1, userId);
             ResultSet rs = getUser.executeQuery();
@@ -34,7 +32,6 @@ public class AssignRoleServlet extends HttpServlet {
 
             String newEmail = "admin" + oldEmail;
 
-            // Cek apakah user admin baru sudah ada
             PreparedStatement check = conn.prepareStatement("SELECT id FROM user WHERE email = ?");
             check.setString(1, newEmail);
             ResultSet checkRs = check.executeQuery();
@@ -45,7 +42,6 @@ public class AssignRoleServlet extends HttpServlet {
                 return;
             }
 
-            // Insert user baru sebagai admin
             PreparedStatement insertAdminUser = conn.prepareStatement(
                 "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             insertAdminUser.setString(1, name);
@@ -54,14 +50,12 @@ public class AssignRoleServlet extends HttpServlet {
             insertAdminUser.setString(4, "admin");
             insertAdminUser.executeUpdate();
 
-            // Ambil ID user admin yang baru dibuat
             ResultSet generatedKeys = insertAdminUser.getGeneratedKeys();
             int newAdminId = -1;
             if (generatedKeys.next()) {
                 newAdminId = generatedKeys.getInt(1);
             }
 
-            // Tambah ke tabel admin
             PreparedStatement insertAdmin = conn.prepareStatement("INSERT INTO admin (id) VALUES (?)");
             insertAdmin.setInt(1, newAdminId);
             insertAdmin.executeUpdate();

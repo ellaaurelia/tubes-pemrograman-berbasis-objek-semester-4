@@ -27,7 +27,6 @@ public class EnrollCourseServlet extends HttpServlet {
         int studentId = student.getId();
 
         try (Connection conn = getConnection()) {
-            // Ambil course yang belum dienroll oleh student
             String sql = "SELECT * FROM course WHERE id NOT IN (SELECT course_id FROM course_enrollments WHERE student_id = ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, studentId);

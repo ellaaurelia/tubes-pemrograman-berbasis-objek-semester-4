@@ -1,9 +1,3 @@
-<%-- 
-    Document   : adminPanel
-    Created on : Jun 13, 2025, 9:32:42 AM
-    Author     : ellaa
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -21,10 +15,11 @@
         <div class="section">
             <h2>Student Progress</h2>
             <table border="1">
-                <tr><th>Name</th><th>Courses Taken</th><th>Assignments Completed</th></tr>
+                <tr><th>Name</th><th>Level</th><th>Courses Taken</th><th>Assignments Completed</th></tr>
                 <c:forEach var="student" items="${students}">
                     <tr>
                         <td>${student.name}</td>
+                        <td>${student.level}</td>
                         <td>
                             <c:choose>
                                 <c:when test="${empty student.course_names}">

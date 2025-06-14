@@ -1,9 +1,3 @@
-<%-- 
-    Document   : studentDashboard.jsp
-    Created on : Jun 13, 2025, 9:34:26 AM
-    Author     : ellaa
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -15,6 +9,7 @@
     </head>
     <body>
         <h1>Welcome, ${student.name}</h1>
+        <p>Level: ${student.level}</p>
         <a href="/TaskTrack/logout">Logout</a>
 
         <h2>To‑Do List</h2>

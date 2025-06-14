@@ -81,6 +81,15 @@ public class UpdateAssignmentStatusServlet extends HttpServlet {
 
             student.setAssignmentsCompleted(completed);
             student.setLevel(level);
+            
+            try (PreparedStatement update = conn.prepareStatement("""
+                UPDATE student SET level = ?, assignments_completed = ? WHERE id = ?
+            """)) {
+                update.setInt(1, level);
+                update.setInt(2, completed);
+                update.setInt(3, studentId);
+                update.executeUpdate();
+            }
 
             conn.commit();
 

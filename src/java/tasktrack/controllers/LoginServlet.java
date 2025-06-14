@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
             }
         } catch (AuthenticationException e) {
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
         }
     }
 }

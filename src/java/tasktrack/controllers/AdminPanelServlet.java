@@ -19,7 +19,7 @@ public class AdminPanelServlet extends HttpServlet {
 
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(
-                "SELECT u.id, u.name, " +
+                "SELECT u.id, u.name, s.level," +
                 "COUNT(DISTINCT ce.course_id) AS courses, " +
                 "COUNT(DISTINCT ac.assignment_id) AS assignments_completed, " +
                 "GROUP_CONCAT(DISTINCT c.name SEPARATOR ', ') AS course_names " +
@@ -28,16 +28,17 @@ public class AdminPanelServlet extends HttpServlet {
                 "LEFT JOIN course_enrollments ce ON u.id = ce.student_id " +
                 "LEFT JOIN course c ON ce.course_id = c.id " +
                 "LEFT JOIN assignment_completions ac ON u.id = ac.student_id " +
-                "GROUP BY u.id, u.name " +
+                "GROUP BY u.id, u.name, s.level " +
                 "ORDER BY assignments_completed ASC"
             );
             while (rs.next()) {
                 Map<String, Object> student = new HashMap<>();
                 student.put("id", rs.getInt("id"));
                 student.put("name", rs.getString("name"));
+                student.put("level", rs.getInt("level"));
                 student.put("courses", rs.getInt("courses"));
                 student.put("completed", rs.getInt("assignments_completed"));
-                student.put("course_names", rs.getString("course_names"));  // ✅ Tambah ini
+                student.put("course_names", rs.getString("course_names"));
                 students.add(student);
             }
 
@@ -57,7 +58,7 @@ public class AdminPanelServlet extends HttpServlet {
                 a.put("title", rs.getString("title"));
                 a.put("deadline", rs.getDate("deadline"));
                 a.put("course_id", rs.getInt("course_id"));
-                a.put("course_name", rs.getString("course_name"));  // ✅ Ini penting
+                a.put("course_name", rs.getString("course_name"));
                 assignments.add(a);
             }
 
