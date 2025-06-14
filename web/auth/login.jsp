@@ -22,7 +22,7 @@
                 <div class="text-red-500 text-sm mb-4"><%= error %></div>
             <% } %>
 
-            <form class="mt-6 w-1/3" method="post" action="login">
+            <form class="mt-6 w-1/3" method="post" action="${pageContext.request.contextPath}/login">
                 <div>
                     <label for="email">Email</label>
                     <input type="email" name="email" id="email" class="mt-1 block border border-gray-300 rounded px-2 py-1 text-sm outline-none w-full" />

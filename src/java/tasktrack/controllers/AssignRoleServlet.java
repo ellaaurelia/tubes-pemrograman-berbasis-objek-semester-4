@@ -5,33 +5,91 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.sql.*;
+import java.util.*;
+import tasktrack.utils.DatabaseConnection;
+import tasktrack.models.*;
 
 @WebServlet(name = "AssignRoleServlet", urlPatterns = {"/assignRole"})
 public class AssignRoleServlet extends HttpServlet {
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int userId = Integer.parseInt(req.getParameter("user_id"));
-        String action = req.getParameter("action");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int userId = Integer.parseInt(request.getParameter("user_id"));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/tasktrack", "root", "")) {
-            if ("promote".equals(action)) {
-                PreparedStatement promote = conn.prepareStatement("UPDATE user SET role='admin', email=CONCAT('admin', email) WHERE id=?");
-                promote.setInt(1, userId);
-                promote.executeUpdate();
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Ambil user lama (student)
+            PreparedStatement getUser = conn.prepareStatement("SELECT name, email, password FROM user WHERE id = ?");
+            getUser.setInt(1, userId);
+            ResultSet rs = getUser.executeQuery();
 
-                PreparedStatement insertAdmin = conn.prepareStatement("INSERT INTO admin (id) VALUES (?)");
-                insertAdmin.setInt(1, userId);
-                insertAdmin.executeUpdate();
-            } else if ("demote".equals(action)) {
-                PreparedStatement demote = conn.prepareStatement("UPDATE user SET role='student', email=REPLACE(email, 'admin', '') WHERE id=?");
-                demote.setInt(1, userId);
-                demote.executeUpdate();
-
-                PreparedStatement deleteAdmin = conn.prepareStatement("DELETE FROM admin WHERE id=?");
-                deleteAdmin.setInt(1, userId);
-                deleteAdmin.executeUpdate();
+            if (!rs.next()) {
+                request.setAttribute("error", "User not found.");
+                request.getRequestDispatcher("/admin/assignRole.jsp").forward(request, response);
+                return;
             }
-            resp.sendRedirect("admin");
+
+            String name = rs.getString("name");
+            String oldEmail = rs.getString("email");
+            String password = rs.getString("password");
+
+            String newEmail = "admin" + oldEmail;
+
+            // Cek apakah user admin baru sudah ada
+            PreparedStatement check = conn.prepareStatement("SELECT id FROM user WHERE email = ?");
+            check.setString(1, newEmail);
+            ResultSet checkRs = check.executeQuery();
+
+            if (checkRs.next()) {
+                request.setAttribute("error", "Admin account already exists for this user.");
+                request.getRequestDispatcher("/admin/assignRole.jsp").forward(request, response);
+                return;
+            }
+
+            // Insert user baru sebagai admin
+            PreparedStatement insertAdminUser = conn.prepareStatement(
+                "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            insertAdminUser.setString(1, name);
+            insertAdminUser.setString(2, newEmail);
+            insertAdminUser.setString(3, password);
+            insertAdminUser.setString(4, "admin");
+            insertAdminUser.executeUpdate();
+
+            // Ambil ID user admin yang baru dibuat
+            ResultSet generatedKeys = insertAdminUser.getGeneratedKeys();
+            int newAdminId = -1;
+            if (generatedKeys.next()) {
+                newAdminId = generatedKeys.getInt(1);
+            }
+
+            // Tambah ke tabel admin
+            PreparedStatement insertAdmin = conn.prepareStatement("INSERT INTO admin (id) VALUES (?)");
+            insertAdmin.setInt(1, newAdminId);
+            insertAdmin.executeUpdate();
+
+            request.setAttribute("message", "Admin account created: " + newEmail);
+            request.getRequestDispatcher("/admin/assignRole.jsp").forward(request, response);
+
+        } catch (SQLException e) {
+            throw new ServletException(e);
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT id, name FROM user WHERE role = 'student'");
+            ResultSet rs = ps.executeQuery();
+
+            List<Map<String, Object>> users = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> user = new HashMap<>();
+                user.put("id", rs.getInt("id"));
+                user.put("name", rs.getString("name"));
+                users.add(user);
+            }
+
+            request.setAttribute("users", users);
+            request.getRequestDispatcher("/admin/assignRole.jsp").forward(request, response);
         } catch (SQLException e) {
             throw new ServletException(e);
         }

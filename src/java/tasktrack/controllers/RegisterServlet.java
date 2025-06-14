@@ -31,10 +31,10 @@ public class RegisterServlet extends HttpServlet {
 
         try {
             authService.register(student);
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
         } catch (AuthenticationException e) {
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
         }
     }
 }

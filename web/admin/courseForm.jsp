@@ -14,7 +14,7 @@
     <body>
         <h2>${course != null ? "Edit Course" : "Add Course"}</h2>
 
-        <form action="courseManagement" method="post">
+        <form action="${pageContext.request.contextPath}/${course != null ? 'editCourse' : 'addCourse'}" method="post">
             <input type="hidden" name="action" value="${course != null ? 'edit' : 'add'}"/>
             <c:if test="${course != null}">
                 <input type="hidden" name="id" value="${course.id}"/>
@@ -29,6 +29,6 @@
             <button type="submit">${course != null ? "Update" : "Add"} Course</button>
         </form>
 
-        <a href="adminPanel.jsp">Back to Admin Panel</a>
+        <a href="${pageContext.request.contextPath}/admin">Back to Admin Panel</a>
     </body>
 </html>

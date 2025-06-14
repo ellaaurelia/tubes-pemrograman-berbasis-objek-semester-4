@@ -17,20 +17,16 @@
         <c:forEach var="course" items="${courses}">
           <tr><td>${course.name}</td><td>${course.description}</td>
             <td>
-              <c:choose>
-                <c:when test="${course.enrolled}">
-                  Already Enrolled
-                </c:when>
-                <c:otherwise>
-                  <form method="post" action="enroll">
+                <form method="post" action="${pageContext.request.contextPath}/enroll">
                     <input type="hidden" name="courseId" value="${course.id}"/>
                     <button type="submit">Enroll</button>
-                  </form>
-                </c:otherwise>
-              </c:choose>
+                </form>
             </td></tr>
         </c:forEach>
         </table>
-        <a href="student">Back to Dashboard</a>
+        <c:if test="${empty courses}">
+            <p>No courses available.</p>
+        </c:if>
+        <a href="${pageContext.request.contextPath}/student">Back to Dashboard</a>
     </body>
 </html>

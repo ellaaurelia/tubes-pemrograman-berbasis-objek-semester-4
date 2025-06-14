@@ -34,13 +34,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("role", user instanceof tasktrack.models.Student ? "student" : "admin");
 
             if (user instanceof tasktrack.models.Student) {
-                response.sendRedirect("student/studentDashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/student");
             } else {
-                response.sendRedirect("admin/adminPanel.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin");
             }
         } catch (AuthenticationException e) {
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
         }
     }
 }

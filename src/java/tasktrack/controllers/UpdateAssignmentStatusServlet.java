@@ -7,11 +7,12 @@ import javax.servlet.http.*;
 import java.sql.*;
 import tasktrack.models.Student;
 import java.util.Date;
+import tasktrack.utils.DatabaseConnection;
 
 @WebServlet(name = "UpdateAssignmentStatusServlet", urlPatterns = {"/updateAssignmentStatus"})
 public class UpdateAssignmentStatusServlet extends HttpServlet {
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/tasktrack", "root", "your_password");
+        return DatabaseConnection.getConnection();
     }
 
     @Override
@@ -87,6 +88,6 @@ public class UpdateAssignmentStatusServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        response.sendRedirect("student");
+        response.sendRedirect(request.getContextPath() + "/student");
     }
 }

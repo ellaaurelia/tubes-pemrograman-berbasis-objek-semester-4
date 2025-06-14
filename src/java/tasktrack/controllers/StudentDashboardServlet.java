@@ -7,12 +7,13 @@ import javax.servlet.http.*;
 import java.sql.*;
 import java.util.*;
 import tasktrack.models.*;
+import tasktrack.utils.DatabaseConnection;
 
 @WebServlet(name = "StudentDashboardServlet", urlPatterns = {"/student"})
 public class StudentDashboardServlet extends HttpServlet {
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/tasktrack", "root", "your_password");
+        return DatabaseConnection.getConnection();
     }
 
     @Override
@@ -21,21 +22,18 @@ public class StudentDashboardServlet extends HttpServlet {
         Student student = (Student) session.getAttribute("user");
 
         if (student == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         int studentId = student.getId();
         int page = Integer.parseInt(Optional.ofNullable(request.getParameter("page")).orElse("1"));
-        int cpage = Integer.parseInt(Optional.ofNullable(request.getParameter("cpage")).orElse("1"));
         int limit = 10;
         int offset = (page - 1) * limit;
-        int coffset = (cpage - 1) * limit;
 
         List<Map<String, Object>> assignments = new ArrayList<>();
         List<Map<String, Object>> courses = new ArrayList<>();
         int totalAssignments = 0;
-        int totalCourses = 0;
 
         try (Connection conn = getConnection()) {
 
@@ -68,12 +66,6 @@ public class StudentDashboardServlet extends HttpServlet {
                         if (completedAt != null) {
                             status = "Done";
                         } else if (deadline.before(now)) {
-                            Calendar cal = Calendar.getInstance();
-                            cal.setTime(deadline);
-                            cal.add(Calendar.DAY_OF_MONTH, 7);
-                            if (now.after(cal.getTime())) {
-                                continue;
-                            }
                             status = "Late";
                         } else {
                             status = "Pending";
@@ -102,18 +94,16 @@ public class StudentDashboardServlet extends HttpServlet {
                 }
             }
 
+            // ✅ Show all courses, no limit
             String queryCourses = """
                 SELECT c.id, c.name, c.description
                 FROM course c
                 JOIN course_enrollments ce ON c.id = ce.course_id
                 WHERE ce.student_id = ?
-                LIMIT ? OFFSET ?
             """;
 
             try (PreparedStatement ps = conn.prepareStatement(queryCourses)) {
                 ps.setInt(1, studentId);
-                ps.setInt(2, limit);
-                ps.setInt(3, coffset);
 
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -126,15 +116,6 @@ public class StudentDashboardServlet extends HttpServlet {
                 }
             }
 
-            try (PreparedStatement countStmt = conn.prepareStatement("""
-                SELECT COUNT(*) FROM course_enrollments WHERE student_id = ?
-            """)) {
-                countStmt.setInt(1, studentId);
-                try (ResultSet rs = countStmt.executeQuery()) {
-                    if (rs.next()) totalCourses = rs.getInt(1);
-                }
-            }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -144,8 +125,6 @@ public class StudentDashboardServlet extends HttpServlet {
         request.setAttribute("enrolled", courses);
         request.setAttribute("page", page);
         request.setAttribute("totalPages", (int) Math.ceil(totalAssignments / 10.0));
-        request.setAttribute("cpage", cpage);
-        request.setAttribute("ctotal", (int) Math.ceil(totalCourses / 10.0));
-        request.getRequestDispatcher("studentDashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/student/studentDashboard.jsp").forward(request, response);
     }
 }

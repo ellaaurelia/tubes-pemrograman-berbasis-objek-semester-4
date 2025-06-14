@@ -2,18 +2,14 @@ package tasktrack.services;
 
 import tasktrack.models.*;
 import tasktrack.exceptions.AuthenticationException;
-
+import tasktrack.utils.DatabaseConnection;
 import java.sql.*;
 
 public class AuthenticationService {
-    private final String JDBC_URL = "jdbc:mysql://localhost:3306/tasktrack";
-    private final String DB_USER = "root";
-    private final String DB_PASSWORD = "";
-
     public User login(String email, String password) throws AuthenticationException {
         String query = "SELECT * FROM user WHERE email = ?";
 
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, email);
@@ -51,7 +47,7 @@ public class AuthenticationService {
         String insertUser = "INSERT INTO user(name, email, password, role) VALUES (?, ?, ?, 'student')";
         String insertStudent = "INSERT INTO student(id, level, assignments_completed) VALUES (?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD)) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
 
             try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {

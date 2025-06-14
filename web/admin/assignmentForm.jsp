@@ -14,7 +14,7 @@
     <body>
         <h2>${assignment != null ? "Edit Assignment" : "Add Assignment"}</h2>
 
-        <form action="assignmentManagement" method="post">
+        <form action="${pageContext.request.contextPath}/assignmentList" method="post">
             <input type="hidden" name="action" value="${assignment != null ? 'edit' : 'add'}"/>
             <c:if test="${assignment != null}">
                 <input type="hidden" name="id" value="${assignment.id}"/>
@@ -23,7 +23,7 @@
             <label for="title">Title:</label><br>
             <input type="text" id="title" name="title" value="${assignment != null ? assignment.title : ''}" required><br><br>
 
-            <label for="deadline">Deadline (yyyy-mm-dd):</label><br>
+            <label for="deadline">Deadline:</label><br>
             <input type="date" id="deadline" name="deadline" value="${assignment != null ? assignment.deadline : ''}" required><br><br>
 
             <label for="courseId">Course:</label><br>
@@ -38,6 +38,6 @@
             <button type="submit">${assignment != null ? "Update" : "Add"} Assignment</button>
         </form>
 
-        <a href="adminPanel.jsp">Back to Admin Panel</a>
+        <a href="${pageContext.request.contextPath}/admin">Back to Admin Panel</a>
     </body>
 </html>
