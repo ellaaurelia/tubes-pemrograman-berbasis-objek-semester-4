@@ -162,7 +162,7 @@
             <h2 class="text-2xl font-semibold text-indigo-500 mb-2">Assign Role</h2>
             <a href="${pageContext.request.contextPath}/assignRole"
                class="inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
-               Promote Student to Admin
+               Create Admin Role for Student
             </a>
         </div>
     </div>

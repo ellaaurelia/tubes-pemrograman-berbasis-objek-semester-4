@@ -38,7 +38,7 @@
                             </td>
 
                             <td class="px-4 py-2 font-semibold
-                                ${a.status == 'Done' ? 'text-green-600' : 'text-gray-500'}">
+                                ${a.status == 'Done' ? 'text-green-600' : (a.status == 'Late' ? 'text-red-600' : 'text-gray-500')}">
                                 ${a.status}
                             </td>
 

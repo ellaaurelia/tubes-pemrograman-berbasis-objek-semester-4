@@ -39,7 +39,7 @@ public class AssignRoleServlet extends HttpServlet {
             String oldEmail = rs.getString("email");
             String password = rs.getString("password");
 
-            String newEmail = "admin" + oldEmail;
+            String newEmail = "admin." + oldEmail;
 
             PreparedStatement check = conn.prepareStatement("SELECT id FROM user WHERE email = ?");
             check.setString(1, newEmail);
