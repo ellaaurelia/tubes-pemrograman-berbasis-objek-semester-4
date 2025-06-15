@@ -19,18 +19,33 @@ public class StudentDashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Student student = (Student) session.getAttribute("user");
+        Object user = session.getAttribute("user");
 
-        if (student == null) {
+        if (!(user instanceof Student)) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
+        Student student = (Student) user;
 
         int studentId = student.getId();
         List<Map<String, Object>> assignments = new ArrayList<>();
         List<Map<String, Object>> courses = new ArrayList<>();
 
         try (Connection conn = getConnection()) {
+            
+            try (PreparedStatement ps = conn.prepareStatement("""
+                SELECT level, assignments_completed FROM student WHERE id = ?
+            """)) {
+                ps.setInt(1, studentId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        student.setLevel(rs.getInt("level"));
+                        student.setAssignmentsCompleted(rs.getInt("assignments_completed"));
+                        session.setAttribute("user", student); // update session juga
+                    }
+                }
+            }
 
             String queryAssignments = """
                 SELECT a.id, a.title, a.deadline, c.name AS course_name,

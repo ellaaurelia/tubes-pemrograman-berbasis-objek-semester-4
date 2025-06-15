@@ -17,12 +17,14 @@ public class EnrollCourseServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Student student = (Student) session.getAttribute("user");
+        Object user = session.getAttribute("user");
 
-        if (student == null) {
+        if (!(user instanceof Student)) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
+        Student student = (Student) user;
 
         int studentId = student.getId();
 
