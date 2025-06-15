@@ -42,7 +42,7 @@ public class StudentDashboardServlet extends HttpServlet {
                     if (rs.next()) {
                         student.setLevel(rs.getInt("level"));
                         student.setAssignmentsCompleted(rs.getInt("assignments_completed"));
-                        session.setAttribute("user", student); // update session juga
+                        session.setAttribute("user", student);
                     }
                 }
             }
