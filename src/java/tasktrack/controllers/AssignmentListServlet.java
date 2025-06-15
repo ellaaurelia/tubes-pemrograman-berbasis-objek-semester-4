@@ -1,18 +1,26 @@
 package tasktrack.controllers;
 
-import tasktrack.utils.DatabaseConnection;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import tasktrack.models.*;
+import tasktrack.utils.DatabaseConnection;
 
 @WebServlet(name = "AssignmentListServlet", urlPatterns = {"/assignmentList"})
 public class AssignmentListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
+
+        if (!(user instanceof Admin)) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String id = request.getParameter("id");
 
         try (Connection conn = DatabaseConnection.getConnection()) {

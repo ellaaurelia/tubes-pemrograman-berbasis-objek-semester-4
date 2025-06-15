@@ -6,7 +6,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.sql.*;
 import tasktrack.models.Student;
-import java.util.Date;
 import tasktrack.utils.DatabaseConnection;
 
 @WebServlet(name = "UpdateAssignmentStatusServlet", urlPatterns = {"/updateAssignmentStatus"})
@@ -26,12 +25,23 @@ public class UpdateAssignmentStatusServlet extends HttpServlet {
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
+            
+            try (PreparedStatement stmt = conn.prepareStatement("""
+                SELECT level, assignments_completed FROM student WHERE id = ?
+            """)) {
+                stmt.setInt(1, studentId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        student.setLevel(rs.getInt("level"));
+                        student.setAssignmentsCompleted(rs.getInt("assignments_completed"));
+                    }
+                }
+            }
 
             boolean alreadyCompleted = false;
-            Date deadline = null;
 
             try (PreparedStatement check = conn.prepareStatement("""
-                SELECT a.deadline, ac.completed_at
+                SELECT ac.completed_at
                 FROM assignment a
                 LEFT JOIN assignment_completions ac ON a.id = ac.assignment_id AND ac.student_id = ?
                 WHERE a.id = ?
@@ -40,14 +50,10 @@ public class UpdateAssignmentStatusServlet extends HttpServlet {
                 check.setInt(2, assignmentId);
                 try (ResultSet rs = check.executeQuery()) {
                     if (rs.next()) {
-                        deadline = rs.getDate("deadline");
                         alreadyCompleted = rs.getTimestamp("completed_at") != null;
                     }
                 }
             }
-
-            int level = student.getLevel();
-            int completed = student.getAssignmentsCompleted();
 
             if (newStatus.equalsIgnoreCase("Done") && !alreadyCompleted) {
                 try (PreparedStatement insert = conn.prepareStatement("""
@@ -59,11 +65,6 @@ public class UpdateAssignmentStatusServlet extends HttpServlet {
                     insert.executeUpdate();
                 }
 
-                completed++;
-                if (completed >= level * 5) {
-                    level++;
-                }
-
             } else if (newStatus.equalsIgnoreCase("Pending") && alreadyCompleted) {
                 try (PreparedStatement delete = conn.prepareStatement("""
                     DELETE FROM assignment_completions WHERE student_id = ? AND assignment_id = ?
@@ -72,16 +73,26 @@ public class UpdateAssignmentStatusServlet extends HttpServlet {
                     delete.setInt(2, assignmentId);
                     delete.executeUpdate();
                 }
+            }
 
-                completed = Math.max(0, completed - 1);
-                if (completed < (level - 1) * 5 && level > 1) {
-                    level--;
+            int completed = 0;
+            try (PreparedStatement count = conn.prepareStatement("""
+                SELECT COUNT(*) AS total FROM assignment_completions WHERE student_id = ?
+            """)) {
+                count.setInt(1, studentId);
+                try (ResultSet rs = count.executeQuery()) {
+                    if (rs.next()) {
+                        completed = rs.getInt("total");
+                    }
                 }
             }
 
+            int level = Math.max(1, completed / 5 + 1);
+
             student.setAssignmentsCompleted(completed);
             student.setLevel(level);
-            
+            session.setAttribute("user", student);
+
             try (PreparedStatement update = conn.prepareStatement("""
                 UPDATE student SET level = ?, assignments_completed = ? WHERE id = ?
             """)) {

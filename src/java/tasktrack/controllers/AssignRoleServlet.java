@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.sql.*;
 import java.util.*;
+import tasktrack.models.*;
 import tasktrack.utils.DatabaseConnection;
 
 @WebServlet(name = "AssignRoleServlet", urlPatterns = {"/assignRole"})
@@ -13,6 +14,14 @@ public class AssignRoleServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
+
+        if (!(user instanceof Admin)) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         int userId = Integer.parseInt(request.getParameter("user_id"));
 
         try (Connection conn = DatabaseConnection.getConnection()) {

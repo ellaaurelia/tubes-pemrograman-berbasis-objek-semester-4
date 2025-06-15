@@ -6,12 +6,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.sql.*;
 import java.util.*;
+import tasktrack.models.*;
 import tasktrack.utils.DatabaseConnection;
 
 @WebServlet(name = "AdminPanelServlet", urlPatterns = {"/admin"})
 public class AdminPanelServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
+
+        if (!(user instanceof Admin)) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
         try (Connection conn = DatabaseConnection.getConnection()) {
             List<Map<String, Object>> students = new ArrayList<>();
             List<Map<String, Object>> courses = new ArrayList<>();

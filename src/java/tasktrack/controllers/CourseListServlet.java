@@ -5,7 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.sql.*;
-import tasktrack.models.Course;
+import tasktrack.models.*;
 import tasktrack.utils.DatabaseConnection;
 
 
@@ -14,6 +14,14 @@ public class CourseListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
+
+        if (!(user instanceof Admin)) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String id = request.getParameter("id");
 
         try (Connection conn = DatabaseConnection.getConnection()) {
