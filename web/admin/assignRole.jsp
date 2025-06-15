@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
     <div class="max-w-4xl mx-auto p-6 space-y-6">
-        <h2 class="text-3xl font-bold text-indigo-600">Promote Student to Admin</h2>
+        <h2 class="text-3xl font-bold text-indigo-600">Create Admin Role for Student</h2>
 
         <c:if test="${not empty message}">
             <p class="bg-green-100 text-green-700 px-4 py-2 rounded border border-green-300">
@@ -41,7 +41,7 @@
                                         <input type="hidden" name="user_id" value="${user.id}" />
                                         <button type="submit"
                                                 class="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600">
-                                            Promote as Admin
+                                            Create Admin account
                                         </button>
                                     </form>
                                 </td>
@@ -51,7 +51,7 @@
                 </table>
             </div>
             <c:if test="${empty users}">
-                <p class="mt-2 text-gray-500 italic">No students available for promotion.</p>
+                <p class="mt-2 text-gray-500 italic">No students available.</p>
             </c:if>
         </c:if>
 

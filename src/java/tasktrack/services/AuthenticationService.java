@@ -16,12 +16,12 @@ public class AuthenticationService {
             ResultSet rs = stmt.executeQuery();
 
             if (!rs.next()) {
-                throw new AuthenticationException("Email tidak ditemukan!");
+                throw new AuthenticationException("Email not found!");
             }
 
             String storedPassword = rs.getString("password");
             if (!storedPassword.equals(password)) {
-                throw new AuthenticationException("Password salah!");
+                throw new AuthenticationException("Incorrect password!");
             }
 
             int id = rs.getInt("id");
@@ -33,12 +33,12 @@ public class AuthenticationService {
             } else if ("admin".equalsIgnoreCase(role)) {
                 return new Admin(id, name, email, password);
             } else {
-                throw new AuthenticationException("Role tidak dikenal.");
+                throw new AuthenticationException("Unknown role.");
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new AuthenticationException("Terjadi kesalahan koneksi database.");
+            throw new AuthenticationException("Database connection error occured.");
         }
     }
 
@@ -54,7 +54,7 @@ public class AuthenticationService {
                 checkStmt.setString(1, student.getEmail());
                 ResultSet rs = checkStmt.executeQuery();
                 if (rs.next()) {
-                    throw new AuthenticationException("Email sudah terdaftar!");
+                    throw new AuthenticationException("Email is already registered!");
                 }
             }
 
@@ -69,7 +69,7 @@ public class AuthenticationService {
                 if (keys.next()) {
                     userId = keys.getInt(1);
                 } else {
-                    throw new AuthenticationException("Gagal mendapatkan ID user.");
+                    throw new AuthenticationException("Failed to retrieve user ID.");
                 }
             }
 
@@ -81,11 +81,11 @@ public class AuthenticationService {
             }
 
             conn.commit();
-            System.out.println("Registrasi berhasil untuk " + student.getName());
+            System.out.println("Registration successful for " + student.getName());
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new AuthenticationException("Gagal registrasi: " + e.getMessage());
+            throw new AuthenticationException("Registration failed: " + e.getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ public class AuthenticationService {
                 Student student = new Student(id, name, email, password);
                 return student;
             } else {
-                throw new SQLException("Data student tidak ditemukan.");
+                throw new SQLException("Student data not found.");
             }
         }
     }
