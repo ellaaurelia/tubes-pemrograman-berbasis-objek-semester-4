@@ -20,7 +20,6 @@
                     <input type="hidden" name="id" value="${course.id}"/>
                 </c:if>
 
-                <!-- Course Name -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Course Name</label>
                     <input type="text" id="name" name="name"
@@ -28,7 +27,6 @@
                            class="mt-1 block w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                 </div>
 
-                <!-- Description -->
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
                     <textarea id="description" name="description" rows="4" cols="50" required
@@ -37,7 +35,6 @@
                     </textarea>
                 </div>
 
-                <!-- Submit Button -->
                 <button type="submit"
                         class="w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 font-semibold">
                     ${course != null ? "Update" : "Add"} Course
