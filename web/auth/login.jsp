@@ -9,7 +9,7 @@
     </head>
     <body>
         <div class="flex flex-col justify-center items-center h-screen">
-            <h1 class="text-2xl font-semibold">Login</h1>
+            <h1 class="text-4xl font-bold text-indigo-500">Login</h1>
             
             <% String error = (String) request.getAttribute("error"); %>
             <% if (error != null) { %>
@@ -27,7 +27,7 @@
                     <input type="password" name="password" id="password" class="mt-1 block border border-gray-300 rounded px-2 py-1 text-sm outline-none w-full" />
                 </div>
                 
-                <button type="submit" class="mt-6 bg-blue-500 text-white py-2 w-full rounded cursor-pointer hover:bg-blue-500/90 transition-colors">Login</button>
+                <button type="submit" class="mt-6 bg-indigo-500 text-white py-2 w-full rounded cursor-pointer hover:bg-indigo-600 transition-colors">Login</button>
             </form>
         </div>
     </body>
